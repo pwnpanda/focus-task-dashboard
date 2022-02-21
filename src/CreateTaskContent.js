@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Button from "react-bootstrap/Button"
@@ -10,12 +10,11 @@ registerLocale('nb', nb)
 setDefaultLocale('nb', nb)
 
 const CreateTaskContent = () => {    
-    const { setTaskName, taskName, setEndDate, endDate, setShowCalendar, showCalendar, taskNameError, setTaskNameError, hidden } = useTaskContext();
+    const { setTaskName, taskName, setEndDate, endDate, setShowCalendar, showCalendar, taskNameError, setTaskNameError, hidden, getMidnight } = useTaskContext();
     
     const onClick = () => {
         if (taskName==="")  setTaskNameError("Cannot use an empty taskname!");
         else {
-            console.log(taskName, endDate);
             setTaskNameError("");
             setShowCalendar(true);
         }
@@ -24,7 +23,7 @@ const CreateTaskContent = () => {
     const onChange = e => {
         setTaskName(e.target.value)
     }
-    console.log("Show calendar " + showCalendar);
+
     return (
         <div style={showCalendar===true ? hidden: null}>
             <Row className="align-items-center">
@@ -33,7 +32,7 @@ const CreateTaskContent = () => {
             <Row className="align-items-center">
                 <Col>
                     <p>Pick end-date</p>
-                    <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} />
+                    <DatePicker selected={endDate} onChange={(date) => setEndDate(getMidnight(date))} />
                 </Col>
                 <Col>
                     <p>Task</p>

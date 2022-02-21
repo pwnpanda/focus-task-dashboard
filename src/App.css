@@ -14,3 +14,11 @@
   color: wheat;
   text-shadow: 1px 0 0 #212529, 0 -1px 0 #212529, 0 1px 0 #212529, -1px 0 0 #212529;
 }
+
+.App .pad {
+  margin: 1em;
+}
+
+div.row > div > * {
+  max-width: 100%;
+ }
