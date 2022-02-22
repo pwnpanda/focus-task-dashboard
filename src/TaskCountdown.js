@@ -6,41 +6,22 @@ import { Calendar } from '@natscale/react-calendar';
 import { TaskContext } from "./TaskContext";
 
 const MyCalendar = () => {
-    const { startDate, endDate, missedDates, setMissedDates, doneDates, setDoneDates, } = useContext(TaskContext);
-    const [dates, setDates] = useState([]);
-    
-    // Need to set state of dates dynamically:
-    // It needs to be updated after showCalendar is set to True!
-    // Maybe set it in CreateTaskContent and move state to TaskContext?
-    // getMidnight from TaskContext is likely not needed (it is used in CreateTaskContent too)
+    const { missedDates, calDates } = useContext(TaskContext);
+
     // isHighlight is not working and I dont know why... Maybe CSS?
-
-
-    const onChange = useCallback(
-        (val) => {
-            setDates(val);
-        },
-        [setDates],
-    );
-
-    // Highlight dates
-    const isHighlight = [endDate]
-
-    // Disable dates
-    const isDisabled = useCallback((date) => {
-        // disable wednesdays
-        if (date.getDay() === 3) {
-          return true;
-        }
-      }, []);
     
     // Use dark mode, change up size and font size, use no range padding, select range (set artificially!) use disabled for missed and highlight for done
-    // return <Calendar useDarkMode showDualCalendar size={600} fontSize={24} isMultiSelector isHighlight={isHighlight} isDisabled={isDisabled} value={value} />;
-    return <Calendar useDarkMode showDualCalendar size={600} fontSize={24} isMultiSelector initialViewDate={startDate} isHighlight={isHighlight} isDisabled={isDisabled} value={dates} onChange={onChange} />;
+    return <Calendar useDarkMode showDualCalendar noPadRangeCell isRangeSelector size={600} fontSize={24} isDisabled={missedDates} value={calDates} />;
 }
 
 const TaskCountdown = () => {
-    const {setShowCalendar , showCalendar, taskName, hidden} = useContext(TaskContext);
+    const {setShowCalendar , showCalendar, taskName, hidden, workDone, setWorkDone, toggleMissedDay} = useContext(TaskContext);
+
+    const changeWorkDone = () => {
+        setWorkDone( (prevState) => !prevState);
+        // This call finishes before state is changed and gives wrong data TODO fix
+        toggleMissedDay();
+    }
 
     const onClick = () => {
         setShowCalendar(false)
@@ -64,6 +45,7 @@ const TaskCountdown = () => {
                 <Col xs lg="1"></Col>
             </Row>
             <Row>
+                <p>Did you do anything today?</p> <input type="checkbox" checked={workDone} onChange={changeWorkDone}></input>
             </Row>
         </div>
 

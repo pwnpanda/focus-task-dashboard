@@ -10,13 +10,14 @@ registerLocale('nb', nb)
 setDefaultLocale('nb', nb)
 
 const CreateTaskContent = () => {    
-    const { setTaskName, taskName, setEndDate, endDate, setShowCalendar, showCalendar, taskNameError, setTaskNameError, hidden, getMidnight } = useTaskContext();
+    const { startDate, setTaskName, taskName, setEndDate, endDate, setShowCalendar, showCalendar, taskNameError, setTaskNameError, hidden, setCalDates } = useTaskContext();
     
     const onClick = () => {
         if (taskName==="")  setTaskNameError("Cannot use an empty taskname!");
         else {
             setTaskNameError("");
             setShowCalendar(true);
+            setCalDates([startDate, endDate]);
         }
     }
 
@@ -32,7 +33,7 @@ const CreateTaskContent = () => {
             <Row className="align-items-center">
                 <Col>
                     <p>Pick end-date</p>
-                    <DatePicker selected={endDate} onChange={(date) => setEndDate(getMidnight(date))} />
+                    <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} />
                 </Col>
                 <Col>
                     <p>Task</p>
