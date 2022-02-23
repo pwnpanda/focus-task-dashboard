@@ -8,7 +8,6 @@ import { TaskContext } from "./TaskContext";
 const MyCalendar = () => {
     const { missedDates, calDates } = useContext(TaskContext);
 
-    // isHighlight is not working and I dont know why... Maybe CSS?
     
     // Use dark mode, change up size and font size, use no range padding, select range (set artificially!) use disabled for missed and highlight for done
     return <Calendar useDarkMode showDualCalendar noPadRangeCell isRangeSelector size={600} fontSize={24} isDisabled={missedDates} value={calDates} />;
@@ -19,8 +18,6 @@ const TaskCountdown = () => {
 
     const changeWorkDone = () => {
         setWorkDone( (prevState) => !prevState);
-        // This call finishes before state is changed and gives wrong data TODO fix
-        toggleMissedDay();
     }
 
     const onClick = () => {

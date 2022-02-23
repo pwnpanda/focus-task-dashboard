@@ -1,10 +1,13 @@
-import  React, { createContext, useState, useContext } from 'react'
+import  React, { createContext, useState, useContext, useEffect } from 'react'
 import { differenceInDays } from "date-fns"
 // https://devtrium.com/posts/how-use-react-context-pro#use-react-context-with-a-custom-hook
 const TaskContext = createContext();
 
 const TaskProvider = ({ children }) => {
   
+  // TODO save and try to load state from localstorage
+  // TODO save the state, for the current day in localstorage inside useEffect, to make sure it persists
+
   const [showCalendar, setShowCalendar] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState(new Date());
@@ -24,21 +27,19 @@ const TaskProvider = ({ children }) => {
     return tamperDate;
   }
 
-  const toggleMissedDay = () => {
+  useEffect( () => {
     let curDayIndex = differenceInDays(curDate, startDate);
-    console.log(curDayIndex);
 
     let tmpDate = getTmpDate(startDate, curDayIndex);
     let tmpArray = [...missedDates];
-    console.log(workDone);
+    // Never removes it from array? CHECK!
     if (!workDone) tmpArray.push(tmpDate);
     else tmpArray.filter( item => {
       return item!==tmpDate
     });
     
     setMissedDates(tmpArray);
-  }
-
+  }, [workDone])
 
 
   const taskContext = {
@@ -61,7 +62,6 @@ const TaskProvider = ({ children }) => {
     workDone,
     setWorkDone,
     hidden,
-    toggleMissedDay
   };
 
 
