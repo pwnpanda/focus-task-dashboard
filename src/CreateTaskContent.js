@@ -10,19 +10,19 @@ registerLocale('nb', nb)
 setDefaultLocale('nb', nb)
 
 const CreateTaskContent = () => {    
-    const { startDate, setTaskName, taskName, setEndDate, endDate, setShowCalendar, showCalendar, taskNameError, setTaskNameError, hidden, setCalDates } = useTaskContext();
+    const { startDate, setTaskName, taskName, setEndDate, endDate, setShowCalendar, showCalendar, taskNameError, setTaskNameError, hidden, setCalDates, saveStorage } = useTaskContext();
     
     const onClick = () => {
         if (taskName==="")  setTaskNameError("Cannot use an empty taskname!");
         else {
             setTaskNameError("");
             setShowCalendar(true);
-            setCalDates([startDate, endDate]);
+            setCalDates([startDate, endDate], saveStorage);
         }
     }
 
     const onChange = e => {
-        setTaskName(e.target.value)
+        setTaskName(e.target.value, saveStorage)
     }
 
     return (

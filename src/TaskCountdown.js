@@ -1,4 +1,4 @@
-import React, {useContext, useCallback, useState} from 'react'
+import React, {useContext} from 'react'
 import Button from 'react-bootstrap/esm/Button';
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
@@ -8,20 +8,22 @@ import { TaskContext } from "./TaskContext";
 const MyCalendar = () => {
     const { missedDates, calDates } = useContext(TaskContext);
 
+    //console.log(`Missed: ${missedDates} Cal: ${calDates}`)
     
     // Use dark mode, change up size and font size, use no range padding, select range (set artificially!) use disabled for missed and highlight for done
     return <Calendar useDarkMode showDualCalendar noPadRangeCell isRangeSelector size={600} fontSize={24} isDisabled={missedDates} value={calDates} />;
 }
 
 const TaskCountdown = () => {
-    const {setShowCalendar , showCalendar, taskName, hidden, workDone, setWorkDone, toggleMissedDay} = useContext(TaskContext);
+    const {setShowCalendar , showCalendar, taskName, hidden, workDone, setWorkDone, updateAfterChange } = useContext(TaskContext);
 
     const changeWorkDone = () => {
-        setWorkDone( (prevState) => !prevState);
+        setWorkDone( (prevState) => !prevState, updateAfterChange);
     }
 
     const onClick = () => {
-        setShowCalendar(false)
+        setShowCalendar(false);
+        localStorage.clear();
     }
 
     return (
