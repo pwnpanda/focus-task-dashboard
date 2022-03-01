@@ -6,10 +6,17 @@ import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-datepicker/dist/react-datepicker.css";
 import '@natscale/react-calendar/dist/main.css';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux'
+import calendar from './redux-store'
+
+const store = createStore(calendar);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App className="bg-dark" />
+    <Provider store={store}>
+      <App className="bg-dark" />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

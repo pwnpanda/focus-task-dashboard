@@ -38,6 +38,8 @@ const TaskProvider = ({ children }) => {
   // Current callback-solution is not supported (in sub-files)!
   // Need to use componentDidMount and componentDidUpdate instead?
 
+  // Would Redux help?
+
   const [showCalendar, setShowCalendar] = useState(showCalendarInit);
   const [taskName, setTaskName] = useState(taskNameInit);
   const [startDate, setStartDate] = useState(startDateInit);
