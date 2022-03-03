@@ -5,6 +5,7 @@ const SET_SHOW="SET_SHOW";
 const SET_END="SET_END";
 const SET_ERR="SET_ERR";
 const SET_WORK="SET_WORK";
+const RESET="RESET";
 
 function getDefaultState(){
     var showCalendar = false;
@@ -21,8 +22,6 @@ function getDefaultState(){
 
     if (storage !== null){
         storage = JSON.parse(storage);
-        
-        console.log(storage.missedDates);
         
         showCalendar = true;
         taskName = storage.taskName;
@@ -81,20 +80,28 @@ export function setWorkDone(workDone){
     }
 }
 
+export function doReset(){
+    return {
+        type: RESET,
+        "":""
+    }
+}
+
 let defaultState = getDefaultState();
 
 function checkMissedDates(workDone, date, missedDates) {
-    var tmpArr = [...missedDates]
+    var tmpArr = [...missedDates];
+    date = new Date( date.toLocaleDateString() );
     // Need to consider only date, not time TODO
     if (date in missedDates) {
         // If the work has been done, remove from the list
-        //console.log("Before " + missedDates);
+        console.log("Before " + missedDates);
         if (workDone){
           tmpArr = tmpArr.filter( item => {
             return item !== date
           });
         }
-        //console.warn("After " + missedDates);
+        console.warn("After " + missedDates);
     } else {
         // If today is not already in missed-array, add it
         if (!workDone) tmpArr.push(date);
@@ -139,13 +146,16 @@ function goalPlans(state=defaultState, action){
                 ["missedDates"]: checkMissedDates(action.workDone, state.currentDate, state.missedDates)
             }
 
+        case RESET:
+            return getDefaultState();
+
         default:
             return state;
     }
 }
 
 export const saveState = state => {
-    console.log(`state: ${JSON.stringify(state)} goalPlans: ${JSON.stringify(state.goalPlans)}`)
+    //console.log(`state: ${JSON.stringify(state)} goalPlans: ${JSON.stringify(state.goalPlans)}`)
     localStorage.setItem("calendar", JSON.stringify(state.goalPlans))
 }
 

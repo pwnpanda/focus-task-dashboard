@@ -4,7 +4,7 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import { Calendar } from '@natscale/react-calendar';
 import { useDispatch, useSelector } from 'react-redux'
-import { setName, setShowCalendar, setWorkDone } from './redux-store';
+import { doReset, setName, setShowCalendar, setWorkDone } from './redux-store';
 
 const TaskCountdown = () => {
 
@@ -19,6 +19,7 @@ const TaskCountdown = () => {
         dispatch ( setShowCalendar(false) );
         dispatch ( setName('') );
         localStorage.clear();
+        dispatch( doReset() );
     }
 
     return (
