@@ -8,9 +8,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import '@natscale/react-calendar/dist/main.css';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux'
-import calendar from './redux-store'
+import calendar, { saveState } from './redux-store'
 
 const store = createStore(calendar);
+store.subscribe( () => {
+  saveState(store.getState());
+})
 
 ReactDOM.render(
   <React.StrictMode>

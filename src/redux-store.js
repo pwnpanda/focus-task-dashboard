@@ -6,7 +6,7 @@ const SET_END="SET_END";
 const SET_ERR="SET_ERR";
 const SET_WORK="SET_WORK";
 
-function defaultState(){
+function getDefaultState(){
     var showCalendar = false;
     var taskName = "";
     var startDate = new Date();
@@ -22,7 +22,7 @@ function defaultState(){
     if (storage !== null){
         storage = JSON.parse(storage);
         
-        console.warn(storage);
+        console.log(storage.missedDates);
         
         showCalendar = true;
         taskName = storage.taskName;
@@ -30,7 +30,7 @@ function defaultState(){
         endDate = new Date(storage.endDate);
         currentDate = new Date();
         missedDates = storage.missedDates.map( date => new Date(date));
-        toAndFromDates = storage.calDates.map( date => new Date(date));
+        toAndFromDates = storage.toAndFromDates.map( date => new Date(date));
         workDone = storage.workDone;
       }
 
@@ -47,37 +47,37 @@ function defaultState(){
     }
 }
 
-export function setName(goalPlan){
+export function setName(taskName){
     return {
         type: SET_NAME,
-        goalPlan
+        taskName
     }
 }
 
-export function setShowCalendar(goalPlan){
+export function setShowCalendar(showCalendar){
     return {
         type: SET_SHOW,
-        goalPlan
-    }
-}
-// not needed?
-export function setEndDate(goalPlan){
-    return {
-        type: SET_END,
-        goalPlan
+        showCalendar
     }
 }
 
-export function setError(goalPlan){
+export function setEndDate(endDate){
     return {
-        type: SET_ERR,
-        goalPlan
+        type: SET_END,
+        endDate
     }
 }
-export function setWorkDone(goalPlan){
+
+export function setError(error){
+    return {
+        type: SET_ERR,
+        error
+    }
+}
+export function setWorkDone(workDone){
     return {
         type: SET_WORK,
-        goalPlan
+        workDone
     }
 }
 
@@ -85,6 +85,7 @@ let defaultState = getDefaultState();
 
 function checkMissedDates(workDone, date, missedDates) {
     var tmpArr = [...missedDates]
+    // Need to consider only date, not time TODO
     if (date in missedDates) {
         // If the work has been done, remove from the list
         //console.log("Before " + missedDates);
@@ -102,7 +103,7 @@ function checkMissedDates(workDone, date, missedDates) {
     return tmpArr;
 }
 
-function goalPlan(state=defaultState, action){
+function goalPlans(state=defaultState, action){
     switch (action.type){
         
         case SET_NAME:
@@ -143,8 +144,13 @@ function goalPlan(state=defaultState, action){
     }
 }
 
+export const saveState = state => {
+    console.log(`state: ${JSON.stringify(state)} goalPlans: ${JSON.stringify(state.goalPlans)}`)
+    localStorage.setItem("calendar", JSON.stringify(state.goalPlans))
+}
+
 const calendar = combineReducers({
-    goalPlan
+    goalPlans
 });
 
 export default calendar;

@@ -3,27 +3,26 @@ import Button from 'react-bootstrap/esm/Button';
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import { Calendar } from '@natscale/react-calendar';
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setName, setShowCalendar, setWorkDone } from './redux-store';
 
 const TaskCountdown = () => {
 
-    const calendar = useSelector(state => state.goalPlan);
+    const hidden = { display: "none" }
 
-    // TODO change setX functions to redux
-    // TODO change variable names to new ones
+    const calendar = useSelector(state => state.goalPlans);
+    const dispatch = useDispatch();
 
-
-    const changeWorkDone = () => {
-        setWorkDone( (prevState) => !prevState, updateAfterChange);
-    }
+    console.log(calendar);
 
     const onClick = () => {
-        setShowCalendar(false);
+        dispatch ( setShowCalendar(false) );
+        dispatch ( setName('') );
         localStorage.clear();
     }
 
     return (
-        <div  style={showCalendar === true ? null: hidden }>
+        <div  style={calendar.showCalendar === true ? null: hidden }>
             <Row>
                 <Col>
                     <h2>{ calendar.taskName }</h2>
@@ -35,12 +34,12 @@ const TaskCountdown = () => {
             <Row className='pad'>
                 <Col xs lg="1"></Col>
                 <Col xs lg="10">
-                    <Calendar useDarkMode showDualCalendar noPadRangeCell isRangeSelector size={600} fontSize={24} isDisabled={calendar.missedDates} value={calendar.toAndFromDates} />;
+                    <Calendar useDarkMode showDualCalendar noPadRangeCell isRangeSelector size={600} fontSize={24} isDisabled={calendar.missedDates} value={calendar.toAndFromDates} />
                 </Col>
                 <Col xs lg="1"></Col>
             </Row>
             <Row>
-                <p>Did you do anything today?</p> <input type="checkbox" checked={calendar.workDone} onChange={changeWorkDone}></input>
+                <p>Did you do anything today?</p> <input type="checkbox" checked={calendar.workDone} onChange={ () => dispatch( setWorkDone(!calendar.workDone) ) }></input>
             </Row>
         </div>
 
