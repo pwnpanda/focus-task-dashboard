@@ -4,22 +4,49 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import { Calendar } from '@natscale/react-calendar';
 import { useDispatch, useSelector } from 'react-redux'
-import { doReset, setName, setShowCalendar, setWorkDone } from './redux-store';
+import { doReset, setName, setShowCalendar, setWorkDone, setCurDate } from './redux-store';
 
 const TaskCountdown = () => {
 
-    const hidden = { display: "none" }
+    var interval;
 
+    const hidden = { display: "none" }
     const calendar = useSelector(state => state.goalPlans);
     const dispatch = useDispatch();
 
-    console.log(calendar);
+    //console.log(calendar);
+    
+
+    function updateDay(){
+        dispatch( setCurDate( new Date() ) );
+    }
+
+    function setDailyRenew() {
+        interval = setInterval( updateDay, 24*60*60*1000) 
+    }
+
+    // Set time to midnight at 1 past midnight the next day
+    var timeToMidnight = new Date(
+        calendar.currentDate.getFullYear(),
+        calendar.currentDate.getMonth(),
+        calendar.currentDate.getDate()+1,
+        0, 1, 0, 0) - calendar.currentDate;
+    
+    //    console.log(`Hours: ${timeToMidnight/(60*60*1000)%24} - Minutes ${timeToMidnight/(60*1000)%60}`);
+    // Set first date at the next date, then every 24 hours from then on
+    const timeout = setTimeout( () => {
+        updateDay();
+        setDailyRenew(); }
+        , timeToMidnight);
 
     const onClick = () => {
         dispatch ( setShowCalendar(false) );
         dispatch ( setName('') );
         localStorage.clear();
         dispatch( doReset() );
+        clearTimeout(timeout);
+        clearTimeout(interval);
+
     }
 
     return (

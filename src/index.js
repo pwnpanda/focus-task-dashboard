@@ -11,6 +11,7 @@ import { createStore } from 'redux'
 import calendar, { saveState } from './redux-store'
 
 const store = createStore(calendar);
+
 store.subscribe( () => {
   saveState(store.getState());
 })

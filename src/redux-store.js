@@ -5,6 +5,7 @@ const SET_SHOW="SET_SHOW";
 const SET_END="SET_END";
 const SET_ERR="SET_ERR";
 const SET_WORK="SET_WORK";
+const SET_CUR="SET_CUR"
 const RESET="RESET";
 
 function getDefaultState(){
@@ -80,6 +81,13 @@ export function setWorkDone(workDone){
     }
 }
 
+export function setCurDate(curDate) {
+    return {
+        type: SET_CUR,
+        curDate
+    }
+}
+
 export function doReset(){
     return {
         type: RESET,
@@ -122,34 +130,40 @@ function goalPlans(state=defaultState, action){
         case SET_NAME:
             return {
                 ...state,
-                ["taskName"]: action.taskName
+                "taskName": action.taskName
             };
         
         case SET_SHOW:
             return {
                 ...state,
-                ["showCalendar"]: action.showCalendar,
-                ["error"]: ""
+                "showCalendar": action.showCalendar,
+                "error": ""
             };
         
         case SET_END:
             return {
                 ...state,
-                ["endDate"]: action.endDate,
-                ["toAndFromDates"]: [state.startDate, action.endDate]
+                "endDate": action.endDate,
+                "toAndFromDates": [state.startDate, action.endDate]
             };
         
         case SET_ERR:
             return {
                 ...state,
-                ["error"]: action.error
+                "error": action.error
             };
         
         case SET_WORK:
             return {
                 ...state,
-                ["workDone"]: action.workDone,
-                ["missedDates"]: checkMissedDates(action.workDone, state.currentDate, state.missedDates)
+                "workDone": action.workDone,
+                "missedDates": checkMissedDates(action.workDone, state.currentDate, state.missedDates)
+            }
+        
+        case SET_CUR:
+            return {
+                ...state,
+                "currentDate": action.curDate
             }
 
         case RESET:
