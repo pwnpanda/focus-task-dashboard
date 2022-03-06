@@ -89,20 +89,26 @@ export function doReset(){
 
 let defaultState = getDefaultState();
 
+
 function checkMissedDates(workDone, date, missedDates) {
+;
     var tmpArr = [...missedDates];
-    date = new Date( date.toLocaleDateString() );
-    // Need to consider only date, not time TODO
-    if (date in missedDates) {
+    var today = date.toDateString();
+    date = new Date( today );
+    
+    //console.log(`workDone ${workDone} - date: ${date} - missedDates: ${missedDates}`)
+
+    
+    if (missedDates.find( el => {return date.getTime() === el.getTime()} )) {
         // If the work has been done, remove from the list
-        console.log("Before " + missedDates);
         if (workDone){
           tmpArr = tmpArr.filter( item => {
-            return item !== date
+            return item.getTime() !== date.getTime()
           });
         }
-        console.warn("After " + missedDates);
+        //console.warn("After " + tmpArr);
     } else {
+        // console.log(`Not in missedDates - Date: ${date} - MissedDates ${missedDates}`)
         // If today is not already in missed-array, add it
         if (!workDone) tmpArr.push(date);
     }
