@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# TRY WITH:
+- https://ui.mantine.dev/
+- https://mantine.dev/dates/date-picker/
+
 ## Available Scripts
 
 In the project directory, you can run:
