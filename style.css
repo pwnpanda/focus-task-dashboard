@@ -328,6 +328,25 @@ body {
   padding: 4px 0;
 }
 
+/* --- Calendar month label --- */
+.calendar-month-label {
+  grid-column: 1 / -1;
+  color: var(--mint);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 2px 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+}
+
+.calendar-month-label:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
 /* --- Day cells --- */
 .day {
   aspect-ratio: 1;
@@ -335,11 +354,25 @@ body {
   border-radius: var(--radius-xs);
   cursor: default;
   display: flex;
-  font-size: 0.78rem;
+  flex-direction: column;
   justify-content: center;
+  gap: 3px;
   position: relative;
   transition: background 0.12s, transform 0.1s, box-shadow 0.12s;
   user-select: none;
+}
+
+.day-number {
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.day-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.12s;
 }
 
 .day--in-range {
@@ -350,7 +383,6 @@ body {
 
 .day--in-range:hover {
   background: var(--mint-dim);
-  color: var(--mint);
 }
 
 .day--in-range:active {
@@ -367,24 +399,12 @@ body {
   box-shadow: 0 0 0 2px var(--mint);
 }
 
-.day--done {
-  background: var(--green-dim);
-  color: var(--green);
-  font-weight: 700;
+.day--done .day-dot {
+  background: var(--green);
 }
 
-.day--done:hover {
-  background: rgba(134, 239, 172, 0.28);
-}
-
-.day--backdated {
-  background: var(--red-dim);
-  color: var(--red);
-  font-weight: 700;
-}
-
-.day--backdated:hover {
-  background: rgba(252, 165, 165, 0.28);
+.day--backdated .day-dot {
+  background: var(--red);
 }
 
 /* --- Responsive --- */
@@ -419,7 +439,7 @@ body {
     padding: 8px 12px;
   }
 
-  .day {
+  .day-number {
     font-size: 0.7rem;
   }
 }

@@ -164,29 +164,60 @@ function renderGoalView(state, update) {
   calCard.appendChild(calHeader);
 
   const grid = el('div', 'calendar-grid');
-  calendarDays(goal).forEach(date => {
-    const cell = el('div', 'day');
-    const inRange = date >= goal.startDate && date <= goal.endDate;
-    const log = getLog(goal, date);
+  const days = calendarDays(goal);
 
-    if (date === today) cell.classList.add('day--today');
-    cell.classList.add(inRange ? 'day--in-range' : 'day--outside');
+  // Group into weeks of 7 so we can insert month labels between weeks
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
 
-    if (log?.done) {
-      cell.classList.add(log.loggedOn !== date ? 'day--backdated' : 'day--done');
+  let lastMonthKey = null;
+  weeks.forEach(week => {
+    // A new month starts in this week if any day is the 1st
+    const monthStartDate = week.find(d => d.slice(8) === '01');
+    const newMonthKey = monthStartDate ? monthStartDate.slice(0, 7) : null;
+
+    // Show a label at calendar start and whenever the month rolls over
+    if (lastMonthKey === null || newMonthKey) {
+      const labelDate = newMonthKey ?? week[0];
+      const label = el('div', 'calendar-month-label');
+      label.textContent = formatMonth(labelDate);
+      grid.appendChild(label);
+      lastMonthKey = newMonthKey ?? week[0].slice(0, 7);
     }
 
-    cell.title = date;
-    cell.textContent = parseInt(date.slice(8), 10);
+    week.forEach(date => {
+      const cell = el('div', 'day');
+      const inRange = date >= goal.startDate && date <= goal.endDate;
+      const log = getLog(goal, date);
 
-    if (inRange) {
-      cell.addEventListener('click', () => {
-        update({ ...state, goals: [toggleLog(goal, date)] });
-      });
-    }
+      if (date === today) cell.classList.add('day--today');
+      cell.classList.add(inRange ? 'day--in-range' : 'day--outside');
 
-    grid.appendChild(cell);
+      if (log?.done) {
+        cell.classList.add(log.loggedOn !== date ? 'day--backdated' : 'day--done');
+      }
+
+      cell.title = date;
+
+      const numSpan = el('span', 'day-number');
+      numSpan.textContent = parseInt(date.slice(8), 10);
+      cell.appendChild(numSpan);
+
+      const dot = el('span', 'day-dot');
+      cell.appendChild(dot);
+
+      if (inRange) {
+        cell.addEventListener('click', () => {
+          update({ ...state, goals: [toggleLog(goal, date)] });
+        });
+      }
+
+      grid.appendChild(cell);
+    });
   });
+
   calCard.appendChild(grid);
   main.appendChild(calCard);
   wrap.appendChild(main);
@@ -218,4 +249,9 @@ function el(tag, className) {
   const e = document.createElement(tag);
   if (className) e.className = className;
   return e;
+}
+
+function formatMonth(dateStr) {
+  const [y, m] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 }
