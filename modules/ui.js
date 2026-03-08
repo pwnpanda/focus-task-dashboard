@@ -45,7 +45,7 @@ function renderTabBar(state, update) {
     const tab = el('div', 'tab' + (isActive ? ' tab--active' : ''));
 
     const title = el('span', 'tab-title');
-    title.textContent = goal.title.length > 22 ? goal.title.slice(0, 20) + '\u2026' : goal.title;
+    title.textContent = goal.title.length > 22 ? goal.title.slice(0, 21) + '\u2026' : goal.title;
     tab.appendChild(title);
 
     const closeBtn = el('button', 'tab-close');
@@ -208,7 +208,8 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
     const url = window.location.origin + window.location.pathname + encodeStateToHash(state);
     navigator.clipboard.writeText(url).then(() => {
       shareBtn.textContent = 'Copied!';
-      setTimeout(() => { shareBtn.textContent = 'Copy share link'; }, 2000);
+      const resetTimer = setTimeout(() => { shareBtn.textContent = 'Copy share link'; }, 2000);
+      shareBtn.addEventListener('click', () => clearTimeout(resetTimer), { once: true });
     });
   });
 
@@ -241,8 +242,8 @@ function renderCelebrationBanner(goal, pct, onCelebrationDone) {
     onCelebrationDone(goal.id);
   }
 
-  dismissBtn.addEventListener('click', dismiss);
-  setTimeout(dismiss, 8000);
+  dismissBtn.addEventListener('click', () => { clearTimeout(timerId); dismiss(); });
+  const timerId = setTimeout(dismiss, 8000);
 
   return banner;
 }
