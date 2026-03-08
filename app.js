@@ -63,7 +63,7 @@ export function onCelebrationDone(goalId) {
 }
 
 export function getCelebrationQueue() {
-  return celebrationQueue;
+  return [...celebrationQueue];
 }
 
 function init() {
@@ -89,6 +89,7 @@ function init() {
 export function updateState(newState) {
   state = newState;
   autoArchive();
+  queueCelebrations();
   saveToStorage(state);
   renderApp();
 }
