@@ -657,16 +657,8 @@ body {
 
 /* --- Responsive --- */
 @media (max-width: 480px) {
-  .app-header {
-    padding: 10px 16px;
-  }
-
   .card {
     padding: 20px 16px;
-  }
-
-  .calendar-card {
-    padding: 20px 12px;
   }
 
   .form-row {
@@ -680,11 +672,6 @@ body {
   .goal-stats {
     flex-direction: column;
     gap: 2px;
-  }
-
-  .header-actions .btn {
-    font-size: 0.78rem;
-    padding: 8px 12px;
   }
 
   .day-number {
