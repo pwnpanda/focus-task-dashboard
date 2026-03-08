@@ -115,8 +115,10 @@ export function currentStreak(goal) {
 export function bestStreak(goal) {
   let best = 0;
   let run = 0;
-  const days = calendarDays(goal).filter(d => d >= goal.startDate && d <= goal.endDate);
-  for (const date of days) {
+  let cur = goal.startDate;
+  while (cur <= goal.endDate) {
+    const date = cur;
+    cur = addDays(cur, 1);
     if (goal.logs[date]?.done) {
       run++;
       if (run > best) best = run;
