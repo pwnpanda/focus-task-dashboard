@@ -407,6 +407,15 @@ body {
   background: var(--red);
 }
 
+.day--future {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.day--future:hover {
+  background: var(--surface-2);
+}
+
 /* --- Responsive --- */
 @media (max-width: 480px) {
   .app-header {

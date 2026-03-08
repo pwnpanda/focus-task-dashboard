@@ -208,10 +208,12 @@ function renderGoalView(state, update) {
       const dot = el('span', 'day-dot');
       cell.appendChild(dot);
 
-      if (inRange) {
+      if (inRange && date <= today) {
         cell.addEventListener('click', () => {
           update({ ...state, goals: [toggleLog(goal, date)] });
         });
+      } else if (inRange) {
+        cell.classList.add('day--future');
       }
 
       grid.appendChild(cell);
