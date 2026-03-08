@@ -14,17 +14,35 @@
   --text:       #e0f2ee;
   --text-muted: #6b8a80;
 
-  /* Semantic */
+  /* Mint — primary accent */
   --mint:       #2dd4bf;
   --mint-dim:   rgba(45, 212, 191, 0.14);
   --mint-glow:  rgba(45, 212, 191, 0.25);
+
+  /* Pastel greens — done indicator */
   --green:      #86efac;
   --green-dim:  rgba(134, 239, 172, 0.18);
+
+  /* Pastel red — backdated indicator */
   --red:        #fca5a5;
   --red-dim:    rgba(252, 165, 165, 0.18);
-  --lavender:   #c4b5fd;
-  --lavender-dim: rgba(196, 181, 253, 0.16);
+
+  /* Pastel lavender — reward badge */
+  --lavender:       #c4b5fd;
+  --lavender-dim:   rgba(196, 181, 253, 0.16);
+  --lavender-border: rgba(196, 181, 253, 0.28);
+
+  /* Pastel peach — streak best */
   --peach:      #fdba74;
+  --peach-dim:  rgba(253, 186, 116, 0.1);
+
+  /* Pastel sky — dates & secondary info */
+  --sky:        #7dd3fc;
+  --sky-dim:    rgba(125, 211, 252, 0.12);
+
+  /* Pastel rose — used for archive heading accent */
+  --rose:       #fda4af;
+  --rose-dim:   rgba(253, 164, 175, 0.12);
 
   /* Shape */
   --radius:    14px;
@@ -228,16 +246,6 @@ body {
   gap: 8px;
 }
 
-/* --- Main content --- */
-.main-content {
-  max-width: 660px;
-  margin: 0 auto;
-  padding: 24px 16px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 /* --- Goal card --- */
 .goal-card {
   display: flex;
@@ -262,7 +270,7 @@ body {
 
 .reward-badge {
   background: var(--lavender-dim);
-  border: 1px solid rgba(196, 181, 253, 0.25);
+  border: 1px solid var(--lavender-border);
   border-radius: 99px;
   color: var(--lavender);
   font-size: 0.8rem;
@@ -273,7 +281,7 @@ body {
 }
 
 .goal-dates {
-  color: var(--text-muted);
+  color: var(--sky);
   font-size: 0.85rem;
 }
 
@@ -302,11 +310,11 @@ body {
   font-size: 0.82rem;
 }
 
-/* --- Calendar --- */
-.calendar-card {
-  padding: 24px;
+.goal-stats span:last-child {
+  color: var(--sky);
 }
 
+/* --- Calendar --- */
 .calendar-header,
 .calendar-grid {
   display: grid;
@@ -414,6 +422,237 @@ body {
 
 .day--future:hover {
   background: var(--surface-2);
+}
+
+/* --- App layout (tab-based) --- */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- Tab bar --- */
+.tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(13, 17, 23, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 2px;
+  padding: 0 8px;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 500;
+  gap: 6px;
+  padding: 10px 14px;
+  position: relative;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+  user-select: none;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+}
+
+.tab:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.tab--active {
+  color: var(--mint);
+  border-bottom-color: var(--mint);
+}
+
+.tab-title {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0;
+  padding: 0 2px;
+  transition: color 0.12s, opacity 0.12s;
+}
+
+.tab:hover .tab-close {
+  opacity: 1;
+}
+
+.tab-close:hover {
+  color: var(--red);
+}
+
+.tab--add {
+  font-size: 1.2rem;
+  font-weight: 400;
+  padding: 8px 16px;
+}
+
+.tab--archive {
+  margin-left: auto;
+  gap: 6px;
+}
+
+.tab-count {
+  background: var(--surface-2);
+  border-radius: 99px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+}
+
+/* --- Tab content area --- */
+.tab-content {
+  flex: 1;
+}
+
+/* --- Goal view inside tabs --- */
+.goal-view {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.goal-top-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-sm {
+  font-size: 0.8rem;
+  padding: 6px 14px;
+}
+
+/* --- Inline create form --- */
+.create-form-inline {
+  max-width: 480px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.create-heading {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+/* --- Streak row --- */
+.streak-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.streak-chip {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 3px 10px;
+}
+
+.streak-chip--best {
+  color: var(--peach);
+  border-color: rgba(253, 186, 116, 0.3);
+  background: rgba(253, 186, 116, 0.08);
+}
+
+/* --- Celebration banner --- */
+.celebration-banner {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.celebration-banner--win {
+  border-color: var(--mint);
+  background: var(--mint-dim);
+  animation: shimmer 2s ease-in-out 3;
+}
+
+@keyframes shimmer {
+  0%, 100% { box-shadow: 0 0 0 0 var(--mint-glow); }
+  50% { box-shadow: 0 0 24px 4px var(--mint-glow); }
+}
+
+.celebration-msg {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.celebration-banner--win .celebration-msg {
+  color: var(--mint);
+}
+
+.celebration-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* --- Archive view --- */
+.archive-view {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.archive-heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--rose);
+  letter-spacing: -0.01em;
+}
+
+.archive-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.goal-card--archived {
+  opacity: 0.8;
+}
+
+/* --- Calendar wrap --- */
+.calendar-wrap {
+  margin-top: 8px;
 }
 
 /* --- Responsive --- */
