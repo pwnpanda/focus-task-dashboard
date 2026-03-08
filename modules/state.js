@@ -35,5 +35,22 @@ export function clearHash() {
 }
 
 export function emptyState() {
-  return { version: 1, goals: [] };
+  return { version: 2, goals: [], archive: [], activeGoalId: null };
+}
+
+/**
+ * Migrate state from older versions to current schema.
+ * v1 -> v2: add archive array and activeGoalId.
+ */
+export function migrateState(state) {
+  if (!state) return null;
+  if (state.version === 1) {
+    return {
+      version: 2,
+      goals: state.goals ?? [],
+      archive: [],
+      activeGoalId: state.goals?.[0]?.id ?? null,
+    };
+  }
+  return state;
 }
