@@ -81,3 +81,48 @@ export function calendarDays(goal) {
   const startStr = toDateString(start);
   return Array.from({ length: TOTAL }, (_, i) => addDays(startStr, i));
 }
+
+/**
+ * Count consecutive logged days ending on today or yesterday.
+ * Allows today to be unlogged (checks yesterday before breaking).
+ * A single missed day (other than today) resets to 0.
+ * @param {object} goal
+ * @returns {number}
+ */
+export function currentStreak(goal) {
+  const today = toDateString(new Date());
+  let streak = 0;
+  let check = today;
+  while (check >= goal.startDate) {
+    if (goal.logs[check]?.done) {
+      streak++;
+      check = addDays(check, -1);
+    } else if (check === today) {
+      // Today not yet logged — check yesterday before giving up
+      check = addDays(check, -1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+/**
+ * Longest consecutive logged-day run across the entire goal period.
+ * @param {object} goal
+ * @returns {number}
+ */
+export function bestStreak(goal) {
+  let best = 0;
+  let run = 0;
+  const days = calendarDays(goal).filter(d => d >= goal.startDate && d <= goal.endDate);
+  for (const date of days) {
+    if (goal.logs[date]?.done) {
+      run++;
+      if (run > best) best = run;
+    } else {
+      run = 0;
+    }
+  }
+  return best;
+}
