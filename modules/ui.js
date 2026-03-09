@@ -1,6 +1,6 @@
 // modules/ui.js
 import {
-  createGoal, toggleLog, countLoggedDays, totalDays,
+  createGoal, toggleLog, countLoggedDays, totalDays, effectiveTarget,
   daysIn, daysLeft, getLog, toDateString, calendarDays,
   currentStreak, bestStreak,
 } from './goal.js';
@@ -119,6 +119,7 @@ function renderCreateForm(state, update, centered) {
   dateRow.appendChild(makeDateField('startDate', 'Start date'));
   dateRow.appendChild(makeDateField('endDate', 'End date'));
   form.appendChild(dateRow);
+  form.appendChild(makeTargetField());
   form.appendChild(makeField('text', 'reward', 'Reward', 'e.g. New mechanical keyboard'));
 
   const submitBtn = el('button', 'btn btn-primary');
@@ -129,7 +130,7 @@ function renderCreateForm(state, update, centered) {
   form.addEventListener('submit', e => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const goal = createGoal(fd.get('title'), fd.get('startDate'), fd.get('endDate'), fd.get('reward'));
+    const goal = createGoal(fd.get('title'), fd.get('startDate'), fd.get('endDate'), fd.get('reward'), fd.get('targetDays') || null);
     update({ ...state, goals: [...state.goals, goal], activeGoalId: goal.id });
   });
 
@@ -144,7 +145,8 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
   const today = toDateString(new Date());
   const logged = countLoggedDays(goal);
   const total = totalDays(goal);
-  const pct = total > 0 ? Math.round((logged / total) * 100) : 0;
+  const target = effectiveTarget(goal);
+  const pct = target > 0 ? Math.min(100, Math.round((logged / target) * 100)) : 0;
   const streak = currentStreak(goal);
   const best = bestStreak(goal);
 
@@ -180,7 +182,8 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
 
   const goalStats = el('div', 'goal-stats');
   const statsLeft = el('span');
-  statsLeft.textContent = logged + ' of ' + total + ' days worked (' + pct + '%)';
+  const targetLabel = goal.targetDays && goal.targetDays < total ? ' target' : '';
+  statsLeft.textContent = logged + ' of ' + target + targetLabel + ' days (' + pct + '%)';
   const statsRight = el('span');
   statsRight.textContent = daysIn(goal) + ' days in \u00B7 ' + daysLeft(goal) + ' days left';
   goalStats.appendChild(statsLeft);
@@ -203,6 +206,23 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
   }
 
   card.appendChild(renderCalendar(goal, today, state, update));
+
+  const notesSection = el('div', 'goal-notes');
+  const notesLbl = el('div', 'form-label-text');
+  notesLbl.textContent = 'Notes';
+  notesSection.appendChild(notesLbl);
+  const notesArea = el('textarea', 'notes-textarea');
+  notesArea.placeholder = 'Add notes about your progress\u2026';
+  notesArea.value = goal.note || '';
+  notesArea.addEventListener('blur', () => {
+    const newNote = notesArea.value;
+    if (newNote !== (goal.note || '')) {
+      update({ ...state, goals: state.goals.map(g => g.id === goal.id ? { ...g, note: newNote } : g) });
+    }
+  });
+  notesSection.appendChild(notesArea);
+  card.appendChild(notesSection);
+
   wrap.appendChild(card);
 
   shareBtn.addEventListener('click', () => {
@@ -268,7 +288,8 @@ function renderArchiveView(state) {
     const today = toDateString(new Date());
     const logged = countLoggedDays(goal);
     const total = totalDays(goal);
-    const pct = total > 0 ? Math.round((logged / total) * 100) : 0;
+    const target = effectiveTarget(goal);
+    const pct = target > 0 ? Math.min(100, Math.round((logged / target) * 100)) : 0;
     const streak = currentStreak(goal);
     const best = bestStreak(goal);
 
@@ -292,7 +313,8 @@ function renderArchiveView(state) {
 
     const goalStats = el('div', 'goal-stats');
     const statsLeft = el('span');
-    statsLeft.textContent = logged + ' of ' + total + ' days worked (' + pct + '%)';
+    const targetLabel = goal.targetDays && goal.targetDays < total ? ' target' : '';
+    statsLeft.textContent = logged + ' of ' + target + targetLabel + ' days (' + pct + '%)';
     goalStats.appendChild(statsLeft);
 
     card.appendChild(goalHeader);
@@ -312,6 +334,18 @@ function renderArchiveView(state) {
     }
 
     card.appendChild(renderCalendar(goal, today, null, null));
+
+    if (goal.note) {
+      const notesSection = el('div', 'goal-notes');
+      const notesLbl = el('div', 'form-label-text');
+      notesLbl.textContent = 'Notes';
+      notesSection.appendChild(notesLbl);
+      const notesText = el('p', 'notes-readonly');
+      notesText.textContent = goal.note;
+      notesSection.appendChild(notesText);
+      card.appendChild(notesSection);
+    }
+
     wrap.appendChild(card);
   });
 
@@ -398,6 +432,23 @@ function makeField(type, name, labelText, placeholder) {
   input.name = name;
   input.placeholder = placeholder;
   input.required = true;
+  label.appendChild(span);
+  label.appendChild(input);
+  return label;
+}
+
+function makeTargetField() {
+  const label = el('label', 'form-label');
+  const span = el('span', 'form-label-text');
+  span.textContent = 'Target days';
+  const hint = el('span', 'form-label-hint');
+  hint.textContent = ' — optional, leave blank for every day';
+  span.appendChild(hint);
+  const input = el('input', 'form-input');
+  input.type = 'number';
+  input.name = 'targetDays';
+  input.min = '1';
+  input.placeholder = 'e.g. 20';
   label.appendChild(span);
   label.appendChild(input);
   return label;

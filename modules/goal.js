@@ -1,7 +1,8 @@
 // modules/goal.js
 import * as log from './logger.js';
 
-export function createGoal(title, startDate, endDate, reward) {
+export function createGoal(title, startDate, endDate, reward, targetDays = null) {
+  const td = targetDays ? parseInt(targetDays, 10) : null;
   return {
     id: crypto.randomUUID(),
     title,
@@ -10,6 +11,7 @@ export function createGoal(title, startDate, endDate, reward) {
     reward,
     note: '',
     logs: {},
+    targetDays: td && td > 0 ? td : null,
   };
 }
 
@@ -32,6 +34,12 @@ export function countLoggedDays(goal) {
 
 export function totalDays(goal) {
   return daysBetween(goal.startDate, goal.endDate) + 1;
+}
+
+export function effectiveTarget(goal) {
+  const td = goal.targetDays;
+  if (td == null || td <= 0) return totalDays(goal);
+  return Math.min(td, totalDays(goal));
 }
 
 export function daysIn(goal) {
