@@ -26,3 +26,9 @@ yarn-error.log*
 .serena/
 .serena/**
 
+docs
+docs/
+docs/**
+
+
+docs/
