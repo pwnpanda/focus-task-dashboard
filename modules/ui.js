@@ -5,6 +5,7 @@ import {
   currentStreak, bestStreak,
 } from './goal.js';
 import { encodeStateToHash } from './state.js';
+import * as log from './logger.js';
 
 export function render(root, state, update, celebrationQueue, onCelebrationDone) {
   root.textContent = '';
@@ -232,7 +233,7 @@ function renderCelebrationBanner(goal, pct, onCelebrationDone) {
   banner.appendChild(note);
 
   const dismissBtn = el('button', 'btn btn-ghost btn-sm');
-  dismissBtn.textContent = 'Got it';
+  dismissBtn.textContent = 'Move to archive \u2192';
   banner.appendChild(dismissBtn);
 
   let dismissed = false;
@@ -242,8 +243,7 @@ function renderCelebrationBanner(goal, pct, onCelebrationDone) {
     onCelebrationDone(goal.id);
   }
 
-  dismissBtn.addEventListener('click', () => { clearTimeout(timerId); dismiss(); });
-  const timerId = setTimeout(dismiss, 8000);
+  dismissBtn.addEventListener('click', () => dismiss());
 
   return banner;
 }
@@ -354,13 +354,13 @@ function renderCalendar(goal, today, state, update) {
     week.forEach(date => {
       const cell = el('div', 'day');
       const inRange = date >= goal.startDate && date <= goal.endDate;
-      const log = getLog(goal, date);
+      const entry = getLog(goal, date);
 
       if (date === today) cell.classList.add('day--today');
       cell.classList.add(inRange ? 'day--in-range' : 'day--outside');
 
-      if (log?.done) {
-        cell.classList.add(log.loggedOn !== date ? 'day--backdated' : 'day--done');
+      if (entry?.done) {
+        cell.classList.add(entry.loggedOn !== date ? 'day--backdated' : 'day--done');
       }
 
       if (inRange && date > today) cell.classList.add('day--future');
@@ -374,6 +374,7 @@ function renderCalendar(goal, today, state, update) {
 
       if (!readonly && inRange && date <= today) {
         cell.addEventListener('click', () => {
+          log.debug('day click:', date, 'goal:', goal.id);
           update({ ...state, goals: state.goals.map(g => g.id === goal.id ? toggleLog(g, date) : g) });
         });
       }

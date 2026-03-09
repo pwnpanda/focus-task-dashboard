@@ -6,9 +6,9 @@
 :root {
   /* Backgrounds */
   --bg:        #0d1117;
-  --surface:   #161b22;
-  --surface-2: #1e2530;
-  --border:    #2a3441;
+  --surface:   #182236;
+  --surface-2: #1f2b42;
+  --border:    #2e3f58;
 
   /* Text */
   --text:       #e0f2ee;
@@ -308,6 +308,9 @@ body {
   flex-wrap: wrap;
   color: var(--text-muted);
   font-size: 0.82rem;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
 }
 
 .goal-stats span:last-child {
@@ -572,10 +575,10 @@ body {
 }
 
 .streak-chip {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--sky-dim);
+  border: 1px solid rgba(125, 211, 252, 0.22);
   border-radius: 99px;
-  color: var(--text-muted);
+  color: var(--sky);
   font-size: 0.78rem;
   font-weight: 500;
   padding: 3px 10px;
@@ -600,13 +603,21 @@ body {
 
 .celebration-banner--win {
   border-color: var(--mint);
-  background: var(--mint-dim);
-  animation: shimmer 2s ease-in-out 3;
+  background: rgba(45, 212, 191, 0.12);
+  animation: shimmer 1.6s ease-in-out infinite;
 }
 
 @keyframes shimmer {
-  0%, 100% { box-shadow: 0 0 0 0 var(--mint-glow); }
-  50% { box-shadow: 0 0 24px 4px var(--mint-glow); }
+  0%, 100% {
+    background: rgba(45, 212, 191, 0.08);
+    border-color: rgba(45, 212, 191, 0.5);
+    box-shadow: 0 0 8px 2px var(--mint-glow);
+  }
+  50% {
+    background: rgba(45, 212, 191, 0.26);
+    border-color: var(--mint);
+    box-shadow: 0 0 48px 12px var(--mint-glow);
+  }
 }
 
 .celebration-msg {

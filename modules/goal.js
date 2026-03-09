@@ -1,4 +1,5 @@
 // modules/goal.js
+import * as log from './logger.js';
 
 export function createGoal(title, startDate, endDate, reward) {
   return {
@@ -16,8 +17,10 @@ export function toggleLog(goal, date) {
   const today = toDateString(new Date());
   const logs = { ...goal.logs };
   if (logs[date]) {
+    log.debug('toggleLog: removing', date, 'from goal', goal.id);
     delete logs[date];
   } else {
+    log.debug('toggleLog: adding', date, 'to goal', goal.id, '(loggedOn', today + ')');
     logs[date] = { done: true, loggedOn: today };
   }
   return { ...goal, logs };

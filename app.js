@@ -5,6 +5,7 @@ import {
 } from './modules/state.js';
 import { toDateString } from './modules/goal.js';
 import { render } from './modules/ui.js';
+import * as log from './modules/logger.js';
 
 let state = emptyState();
 
@@ -16,6 +17,7 @@ function autoArchive() {
   const today = toDateString(new Date());
   const finishing = state.goals.filter(g => today > g.endDate);
   if (finishing.length === 0) return;
+  log.info('autoArchive: moving', finishing.map(g => g.title), 'to archive');
 
   const finishingIds = new Set(finishing.map(g => g.id));
   const remaining = state.goals.filter(g => !finishingIds.has(g.id));
@@ -87,6 +89,8 @@ function init() {
 }
 
 export function updateState(newState) {
+  log.debug('updateState: goals logged days →',
+    newState.goals.map(g => ({ title: g.title, logged: Object.keys(g.logs).length })));
   state = newState;
   autoArchive();
   queueCelebrations();
