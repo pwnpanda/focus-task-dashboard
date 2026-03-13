@@ -38,3 +38,8 @@ modules/
   state.js          localStorage and URL hash persistence
   ui.js             DOM rendering (no framework)
 ```
+
+## Future features to implement:
+- [ ] Sub-goals for a goal: A TODO-list where you can add things during creation and after the fact. Should be checked/unchecked. Tracking should show how much progress you've made (50% if 1/2 subgoals are reached).
+- [ ] Immediately go to success screen and go with normal archive flow once all goals have been reached
+
