@@ -3,7 +3,7 @@ import {
   loadFromStorage, decodeStateFromHash, saveToStorage,
   clearHash, emptyState, migrateState,
 } from './modules/state.js';
-import { toDateString } from './modules/goal.js';
+import { toDateString, allTodosDone } from './modules/goal.js';
 import { render } from './modules/ui.js';
 import * as log from './modules/logger.js';
 
@@ -34,7 +34,10 @@ function autoArchive() {
 function queueCelebrations() {
   const today = toDateString(new Date());
   state.goals.forEach(g => {
-    if (g.endDate === today && !celebrationQueue.includes(g.id)) {
+    if (celebrationQueue.includes(g.id)) return;
+    const endsToday = g.endDate === today;
+    const todosComplete = allTodosDone(g);
+    if (endsToday || todosComplete) {
       celebrationQueue.push(g.id);
     }
   });

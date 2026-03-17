@@ -2,7 +2,7 @@
 import {
   createGoal, toggleLog, countLoggedDays, totalDays, effectiveTarget,
   daysIn, daysLeft, getLog, toDateString, calendarDays,
-  currentStreak, bestStreak,
+  currentStreak, bestStreak, allTodosDone, todosProgress,
 } from './goal.js';
 import { encodeStateToHash } from './state.js';
 import * as log from './logger.js';
@@ -27,7 +27,7 @@ export function render(root, state, update, celebrationQueue, onCelebrationDone)
   } else {
     const goal = state.goals.find(g => g.id === state.activeGoalId);
     if (goal) {
-      const celebrating = celebrationQueue.includes(goal.id) && goal.endDate === toDateString(new Date());
+      const celebrating = celebrationQueue.includes(goal.id);
       content.appendChild(renderGoalView(state, update, goal, celebrating, onCelebrationDone));
     }
   }
@@ -81,7 +81,27 @@ function renderTabBar(state, update) {
   const archiveTab = el('div', 'tab tab--archive' + (isArchiveActive ? ' tab--active' : ''));
   archiveTab.title = 'Archive';
   const archiveLabel = el('span');
-  archiveLabel.textContent = '\uD83D\uDCE6';
+  const archiveSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  archiveSvg.setAttribute('width', '16');
+  archiveSvg.setAttribute('height', '16');
+  archiveSvg.setAttribute('viewBox', '0 0 24 24');
+  archiveSvg.setAttribute('fill', 'none');
+  archiveSvg.setAttribute('stroke', 'currentColor');
+  archiveSvg.setAttribute('stroke-width', '2');
+  archiveSvg.setAttribute('stroke-linecap', 'round');
+  archiveSvg.setAttribute('stroke-linejoin', 'round');
+  const svgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  svgRect.setAttribute('x', '2'); svgRect.setAttribute('y', '4');
+  svgRect.setAttribute('width', '20'); svgRect.setAttribute('height', '5');
+  svgRect.setAttribute('rx', '1');
+  const svgBody = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  svgBody.setAttribute('d', 'M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9');
+  const svgLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  svgLine.setAttribute('d', 'M10 13h4');
+  archiveSvg.appendChild(svgRect);
+  archiveSvg.appendChild(svgBody);
+  archiveSvg.appendChild(svgLine);
+  archiveLabel.appendChild(archiveSvg);
   archiveTab.appendChild(archiveLabel);
   if (state.archive.length > 0) {
     const count = el('span', 'tab-count');
@@ -122,6 +142,9 @@ function renderCreateForm(state, update, centered) {
   form.appendChild(makeTargetField());
   form.appendChild(makeField('text', 'reward', 'Reward', 'e.g. New mechanical keyboard'));
 
+  const todosField = makeTodosField();
+  form.appendChild(todosField);
+
   const submitBtn = el('button', 'btn btn-primary');
   submitBtn.type = 'submit';
   submitBtn.textContent = 'Start tracking \u2192';
@@ -130,7 +153,11 @@ function renderCreateForm(state, update, centered) {
   form.addEventListener('submit', e => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const goal = createGoal(fd.get('title'), fd.get('startDate'), fd.get('endDate'), fd.get('reward'), fd.get('targetDays') || null);
+    const todos = todosField.getTodos();
+    const goal = createGoal(
+      fd.get('title'), fd.get('startDate'), fd.get('endDate'),
+      fd.get('reward'), fd.get('targetDays') || null, todos,
+    );
     update({ ...state, goals: [...state.goals, goal], activeGoalId: goal.id });
   });
 
@@ -146,7 +173,9 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
   const logged = countLoggedDays(goal);
   const total = totalDays(goal);
   const target = effectiveTarget(goal);
-  const pct = target > 0 ? Math.min(100, Math.round((logged / target) * 100)) : 0;
+  const logPct = target > 0 ? Math.min(100, Math.round((logged / target) * 100)) : 0;
+  const tp = todosProgress(goal);
+  const pct = tp.total > 0 ? Math.round((tp.done / tp.total) * 100) : logPct;
   const streak = currentStreak(goal);
   const best = bestStreak(goal);
 
@@ -159,7 +188,7 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
   wrap.appendChild(topBar);
 
   if (celebrating) {
-    wrap.appendChild(renderCelebrationBanner(goal, pct, onCelebrationDone));
+    wrap.appendChild(renderCelebrationBanner(goal, pct, allTodosDone(goal), onCelebrationDone));
   }
 
   const card = el('div', 'card goal-card');
@@ -182,8 +211,12 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
 
   const goalStats = el('div', 'goal-stats');
   const statsLeft = el('span');
-  const targetLabel = goal.targetDays && goal.targetDays < total ? ' target' : '';
-  statsLeft.textContent = logged + ' of ' + target + targetLabel + ' days (' + pct + '%)';
+  if (tp.total > 0) {
+    statsLeft.textContent = tp.done + ' of ' + tp.total + ' tasks done \u00B7 ' + logged + ' days logged';
+  } else {
+    const targetLabel = goal.targetDays && goal.targetDays < total ? ' target' : '';
+    statsLeft.textContent = logged + ' of ' + target + targetLabel + ' days (' + logPct + '%)';
+  }
   const statsRight = el('span');
   statsRight.textContent = daysIn(goal) + ' days in \u00B7 ' + daysLeft(goal) + ' days left';
   goalStats.appendChild(statsLeft);
@@ -204,6 +237,9 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
     streakRow.appendChild(bestChip);
     card.appendChild(streakRow);
   }
+
+  const todosSection = renderTodos(goal, state, update);
+  if (todosSection) card.appendChild(todosSection);
 
   card.appendChild(renderCalendar(goal, today, state, update));
 
@@ -239,13 +275,64 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
 
 // --- Celebration banner ---
 
-function renderCelebrationBanner(goal, pct, onCelebrationDone) {
-  const banner = el('div', pct >= 80 ? 'celebration-banner celebration-banner--win' : 'celebration-banner');
+function startConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText =
+    'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+  document.body.appendChild(canvas);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+
+  const colors = ['#818cf8', '#f472b6', '#60a5fa', '#10b981', '#f59e0b', '#fb7185', '#a78bfa'];
+  const pieces = Array.from({ length: 100 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height * 0.5,
+    w: 7 + Math.random() * 8,
+    h: 4 + Math.random() * 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+    speed: 2.5 + Math.random() * 4,
+    rotSpeed: (Math.random() - 0.5) * 0.14,
+    drift: (Math.random() - 0.5) * 1.8,
+  }));
+
+  const endTime = Date.now() + 4000;
+  function frame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.y += p.speed;
+      p.x += p.drift;
+      p.rot += p.rotSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (Date.now() < endTime) {
+      requestAnimationFrame(frame);
+    } else {
+      canvas.remove();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function renderCelebrationBanner(goal, pct, todosDone, onCelebrationDone) {
+  const isWin = pct >= 80 || todosDone;
+  const banner = el('div', isWin ? 'celebration-banner celebration-banner--win' : 'celebration-banner');
+  if (isWin) startConfetti();
 
   const msg = el('p', 'celebration-msg');
-  msg.textContent = pct >= 80
-    ? 'Goal complete! You earned: ' + goal.reward
-    : 'Goal period ended. ' + pct + '% completed.';
+  if (todosDone) {
+    msg.textContent = 'All tasks complete! You earned: ' + goal.reward;
+  } else {
+    msg.textContent = pct >= 80
+      ? 'Goal complete! You earned: ' + goal.reward
+      : 'Goal period ended. ' + pct + '% completed.';
+  }
   banner.appendChild(msg);
 
   const note = el('p', 'celebration-note');
@@ -346,6 +433,9 @@ function renderArchiveView(state) {
       card.appendChild(notesSection);
     }
 
+    const archivedTodos = renderTodos(goal, null, null);
+    if (archivedTodos) card.appendChild(archivedTodos);
+
     wrap.appendChild(card);
   });
 
@@ -421,6 +511,45 @@ function renderCalendar(goal, today, state, update) {
   return calWrap;
 }
 
+// --- Todos section ---
+
+function renderTodos(goal, state, update) {
+  const todos = goal.todos ?? [];
+  if (todos.length === 0) return null;
+
+  const section = el('div', 'goal-todos');
+  const lbl = el('div', 'form-label-text');
+  lbl.textContent = 'Checklist';
+  section.appendChild(lbl);
+
+  const list = el('ul', 'todo-list');
+  todos.forEach(todo => {
+    const li = el('li', 'todo-item' + (todo.done ? ' todo-item--done' : ''));
+
+    const checkbox = el('span', 'todo-checkbox' + (todo.done ? ' todo-checkbox--done' : ''));
+    if (todo.done) checkbox.textContent = '\u2713';
+
+    const text = el('span', 'todo-text');
+    text.textContent = todo.text;
+
+    li.appendChild(checkbox);
+    li.appendChild(text);
+
+    if (!todo.done && update) {
+      li.addEventListener('click', () => {
+        const newTodos = todos.map(t => t.id === todo.id ? { ...t, done: true } : t);
+        const newGoals = state.goals.map(g => g.id === goal.id ? { ...g, todos: newTodos } : g);
+        update({ ...state, goals: newGoals });
+      });
+    }
+
+    list.appendChild(li);
+  });
+
+  section.appendChild(list);
+  return section;
+}
+
 // --- Form helpers ---
 
 function makeField(type, name, labelText, placeholder) {
@@ -452,6 +581,70 @@ function makeTargetField() {
   label.appendChild(span);
   label.appendChild(input);
   return label;
+}
+
+function makeTodosField() {
+  const container = el('div', 'todos-field');
+
+  const lbl = el('label', 'form-label');
+  const span = el('span', 'form-label-text');
+  span.textContent = 'Checklist';
+  const hint = el('span', 'form-label-hint');
+  hint.textContent = ' \u2014 optional';
+  span.appendChild(hint);
+  lbl.appendChild(span);
+  container.appendChild(lbl);
+
+  const inputRow = el('div', 'todo-input-row');
+  const input = el('input', 'form-input');
+  input.type = 'text';
+  input.placeholder = 'Add a checklist item\u2026';
+  const addBtn = el('button', 'btn btn-ghost btn-sm todo-add-btn');
+  addBtn.type = 'button';
+  addBtn.textContent = '+';
+  inputRow.appendChild(input);
+  inputRow.appendChild(addBtn);
+  container.appendChild(inputRow);
+
+  const list = el('ul', 'todo-draft-list');
+  container.appendChild(list);
+
+  const items = [];
+
+  function addItem(text) {
+    text = text.trim();
+    if (!text) return;
+    const item = { id: crypto.randomUUID(), text, done: false };
+    items.push(item);
+
+    const li = el('li', 'todo-draft-item');
+    const itemText = el('span', 'todo-draft-text');
+    itemText.textContent = text;
+    const removeBtn = el('button', 'todo-draft-remove');
+    removeBtn.type = 'button';
+    removeBtn.textContent = '\u00D7';
+    removeBtn.addEventListener('click', () => {
+      items.splice(items.indexOf(item), 1);
+      li.remove();
+    });
+    li.appendChild(itemText);
+    li.appendChild(removeBtn);
+    list.appendChild(li);
+
+    input.value = '';
+    input.focus();
+  }
+
+  addBtn.addEventListener('click', () => addItem(input.value));
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addItem(input.value);
+    }
+  });
+
+  container.getTodos = () => [...items];
+  return container;
 }
 
 function makeDateField(name, labelText) {

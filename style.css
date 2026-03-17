@@ -4,45 +4,45 @@
 
 /* --- Custom properties --- */
 :root {
-  /* Backgrounds */
-  --bg:        #0d1117;
-  --surface:   #182236;
-  --surface-2: #1f2b42;
-  --border:    #2e3f58;
+  /* Backgrounds — sage green + lemon cream */
+  --bg:        #bbf7d0;
+  --surface:   #fefce8;
+  --surface-2: #fef9c3;
+  --border:    #86efac;
 
-  /* Text */
-  --text:       #e0f2ee;
-  --text-muted: #6b8a80;
+  /* Text — deep emerald: reads as green, never black */
+  --text:       #065f46;
+  --text-muted: #059669;
 
-  /* Mint — primary accent */
-  --mint:       #2dd4bf;
-  --mint-dim:   rgba(45, 212, 191, 0.14);
-  --mint-glow:  rgba(45, 212, 191, 0.25);
+  /* Mint — primary accent (darker teal, readable on light bg) */
+  --mint:       #0d9488;
+  --mint-dim:   rgba(13, 148, 136, 0.12);
+  --mint-glow:  rgba(13, 148, 136, 0.22);
 
-  /* Pastel greens — done indicator */
-  --green:      #86efac;
-  --green-dim:  rgba(134, 239, 172, 0.18);
+  /* Pastel green — done indicator */
+  --green:      #10b981;
+  --green-dim:  rgba(16, 185, 129, 0.15);
 
   /* Pastel red — backdated indicator */
-  --red:        #fca5a5;
-  --red-dim:    rgba(252, 165, 165, 0.18);
+  --red:        #fb7185;
+  --red-dim:    rgba(251, 113, 133, 0.15);
 
-  /* Pastel lavender — reward badge */
-  --lavender:       #c4b5fd;
-  --lavender-dim:   rgba(196, 181, 253, 0.16);
-  --lavender-border: rgba(196, 181, 253, 0.28);
+  /* Pastel indigo/blue — reward badge */
+  --lavender:       #818cf8;
+  --lavender-dim:   rgba(129, 140, 248, 0.12);
+  --lavender-border: rgba(129, 140, 248, 0.3);
 
-  /* Pastel peach — streak best */
-  --peach:      #fdba74;
-  --peach-dim:  rgba(253, 186, 116, 0.1);
+  /* Pastel amber/yellow — streak best */
+  --peach:      #f59e0b;
+  --peach-dim:  rgba(245, 158, 11, 0.1);
 
-  /* Pastel sky — dates & secondary info */
-  --sky:        #7dd3fc;
-  --sky-dim:    rgba(125, 211, 252, 0.12);
+  /* Pastel blue — dates & secondary info */
+  --sky:        #60a5fa;
+  --sky-dim:    rgba(96, 165, 250, 0.12);
 
-  /* Pastel rose — used for archive heading accent */
-  --rose:       #fda4af;
-  --rose-dim:   rgba(253, 164, 175, 0.12);
+  /* Pastel pink — archive heading accent */
+  --rose:       #f472b6;
+  --rose-dim:   rgba(244, 114, 182, 0.12);
 
   /* Shape */
   --radius:    14px;
@@ -185,7 +185,7 @@ body {
 
 .btn-primary {
   background: var(--mint);
-  color: #0a1f1c;
+  color: #ffffff;
   width: 100%;
   margin-top: 4px;
   padding: 12px 18px;
@@ -193,7 +193,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: #25b8a6;
+  background: #0f766e;
   box-shadow: 0 0 16px var(--mint-glow);
 }
 
@@ -223,7 +223,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(13, 17, 23, 0.88);
+  background: rgba(254, 252, 232, 0.96);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
@@ -294,7 +294,7 @@ body {
 }
 
 .progress-bar {
-  background: linear-gradient(90deg, var(--mint), #5eead4);
+  background: linear-gradient(90deg, var(--mint), #2dd4bf);
   border-radius: 99px;
   height: 100%;
   min-width: 0%;
@@ -439,16 +439,15 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(13, 17, 23, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  background: var(--bg);
   display: flex;
-  align-items: stretch;
+  align-items: center;
   overflow-x: auto;
   scrollbar-width: none;
-  gap: 2px;
-  padding: 0 8px;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, rgba(6, 95, 70, 0.22) 15%, rgba(6, 95, 70, 0.22) 85%, transparent) 1;
 }
 
 .tab-bar::-webkit-scrollbar {
@@ -457,29 +456,31 @@ body {
 
 .tab {
   align-items: center;
-  border-bottom: 2px solid transparent;
-  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(6, 95, 70, 0.18);
+  border-radius: 99px;
+  color: var(--text);
   cursor: pointer;
   display: flex;
   font-size: 0.85rem;
   font-weight: 500;
   gap: 6px;
-  padding: 10px 14px;
-  position: relative;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  padding: 6px 14px;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
   user-select: none;
-  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
 }
 
 .tab:hover {
+  background: rgba(255, 255, 255, 0.68);
   color: var(--text);
-  background: var(--surface-2);
 }
 
 .tab--active {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 2px 8px rgba(6, 95, 70, 0.15);
   color: var(--mint);
-  border-bottom-color: var(--mint);
 }
 
 .tab-title {
@@ -509,14 +510,21 @@ body {
 }
 
 .tab--add {
-  font-size: 1.2rem;
-  font-weight: 400;
-  padding: 8px 16px;
+  background: var(--mint);
+  border-color: transparent;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 5px 14px;
+}
+
+.tab--add:hover {
+  background: #0f766e;
+  color: #ffffff;
 }
 
 .tab--archive {
   margin-left: auto;
-  gap: 6px;
 }
 
 .tab-count {
@@ -576,7 +584,7 @@ body {
 
 .streak-chip {
   background: var(--sky-dim);
-  border: 1px solid rgba(125, 211, 252, 0.22);
+  border: 1px solid rgba(96, 165, 250, 0.28);
   border-radius: 99px;
   color: var(--sky);
   font-size: 0.78rem;
@@ -603,21 +611,8 @@ body {
 
 .celebration-banner--win {
   border-color: var(--mint);
-  background: rgba(45, 212, 191, 0.12);
-  animation: shimmer 1.6s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% {
-    background: rgba(45, 212, 191, 0.08);
-    border-color: rgba(45, 212, 191, 0.5);
-    box-shadow: 0 0 8px 2px var(--mint-glow);
-  }
-  50% {
-    background: rgba(45, 212, 191, 0.26);
-    border-color: var(--mint);
-    box-shadow: 0 0 48px 12px var(--mint-glow);
-  }
+  background: var(--surface);
+  box-shadow: 0 0 24px 4px var(--mint-glow);
 }
 
 .celebration-msg {
@@ -648,7 +643,7 @@ body {
 .archive-heading {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--rose);
+  color: var(--lavender);
   letter-spacing: -0.01em;
 }
 
@@ -705,6 +700,141 @@ body {
   font-size: 0.875rem;
   line-height: 1.5;
   white-space: pre-wrap;
+}
+
+/* --- Todos field (create form) --- */
+.todos-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.todo-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.todo-input-row .form-input {
+  flex: 1;
+}
+
+.todo-add-btn {
+  flex-shrink: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 6px 14px;
+}
+
+.todo-draft-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.todo-draft-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 6px 10px;
+  font-size: 0.88rem;
+}
+
+.todo-draft-text {
+  color: var(--text);
+  flex: 1;
+}
+
+.todo-draft-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.12s;
+}
+
+.todo-draft-remove:hover {
+  color: var(--red);
+}
+
+/* --- Todos section (goal view) --- */
+.goal-todos {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.85rem;
+  padding: 5px 6px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.todo-item:hover:not(.todo-item--done) {
+  background: var(--mint-dim);
+}
+
+.todo-item--done {
+  cursor: default;
+}
+
+.todo-checkbox {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.todo-item:hover:not(.todo-item--done) .todo-checkbox {
+  border-color: var(--mint);
+}
+
+.todo-checkbox--done {
+  background: var(--green);
+  border-color: var(--green);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.todo-text {
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.todo-item:not(.todo-item--done) .todo-text {
+  color: var(--text);
+}
+
+.todo-item--done .todo-text {
+  text-decoration: line-through;
+  opacity: 0.55;
 }
 
 /* --- Form label hint --- */
