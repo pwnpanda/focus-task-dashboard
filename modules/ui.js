@@ -537,8 +537,15 @@ function renderTodos(goal, state, update) {
 
     if (!todo.done && update) {
       li.addEventListener('click', () => {
+        const today = toDateString(new Date());
         const newTodos = todos.map(t => t.id === todo.id ? { ...t, done: true } : t);
-        const newGoals = state.goals.map(g => g.id === goal.id ? { ...g, todos: newTodos } : g);
+        const newGoals = state.goals.map(g => {
+          if (g.id !== goal.id) return g;
+          const logs = g.logs[today]?.done
+            ? g.logs
+            : { ...g.logs, [today]: { done: true, loggedOn: today } };
+          return { ...g, todos: newTodos, logs };
+        });
         update({ ...state, goals: newGoals });
       });
     }
