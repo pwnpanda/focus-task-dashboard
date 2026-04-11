@@ -2,7 +2,7 @@
 import {
   createGoal, toggleLog, countLoggedDays, totalDays, effectiveTarget,
   daysIn, daysLeft, getLog, toDateString, calendarDays,
-  currentStreak, bestStreak, allTodosDone, todosProgress,
+  currentStreak, bestStreak, allTodosDone, todosProgress, targetDaysReached,
 } from './goal.js';
 import { encodeStateToHash } from './state.js';
 import * as log from './logger.js';
@@ -238,6 +238,23 @@ function renderGoalView(state, update, goal, celebrating, onCelebrationDone) {
     card.appendChild(streakRow);
   }
 
+  if (!celebrating && targetDaysReached(goal)) {
+    const finishWrap = el('div', 'finish-goal-wrap');
+    const finishMsg = el('p', 'finish-goal-msg');
+    finishMsg.textContent = 'Target reached! You logged ' + logged + ' of ' + target + ' days.';
+    finishWrap.appendChild(finishMsg);
+    const finishBtn = el('button', 'btn btn-primary btn-sm');
+    finishBtn.textContent = 'Mark as finished';
+    finishBtn.addEventListener('click', () => {
+      const newGoals = state.goals.map(g =>
+        g.id === goal.id ? { ...g, finished: true } : g
+      );
+      update({ ...state, goals: newGoals });
+    });
+    finishWrap.appendChild(finishBtn);
+    card.appendChild(finishWrap);
+  }
+
   const todosSection = renderTodos(goal, state, update);
   if (todosSection) card.appendChild(todosSection);
 
@@ -321,13 +338,15 @@ function startConfetti() {
 }
 
 function renderCelebrationBanner(goal, pct, todosDone, onCelebrationDone) {
-  const isWin = pct >= 80 || todosDone;
+  const isWin = pct >= 80 || todosDone || goal.finished;
   const banner = el('div', isWin ? 'celebration-banner celebration-banner--win' : 'celebration-banner');
   if (isWin) startConfetti();
 
   const msg = el('p', 'celebration-msg');
   if (todosDone) {
     msg.textContent = 'All tasks complete! You earned: ' + goal.reward;
+  } else if (goal.finished) {
+    msg.textContent = 'Target days reached! You earned: ' + goal.reward;
   } else {
     msg.textContent = pct >= 80
       ? 'Goal complete! You earned: ' + goal.reward

@@ -37,7 +37,8 @@ function queueCelebrations() {
     if (celebrationQueue.includes(g.id)) return;
     const endsToday = g.endDate === today;
     const todosComplete = allTodosDone(g);
-    if (endsToday || todosComplete) {
+    const markedFinished = g.finished === true;
+    if (endsToday || todosComplete || markedFinished) {
       celebrationQueue.push(g.id);
     }
   });

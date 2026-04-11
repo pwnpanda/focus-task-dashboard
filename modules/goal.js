@@ -21,6 +21,13 @@ export function allTodosDone(goal) {
   return todos.length > 0 && todos.every(t => t.done);
 }
 
+export function targetDaysReached(goal) {
+  const todos = goal.todos ?? [];
+  if (todos.length > 0) return false;
+  if (goal.targetDays == null || goal.targetDays <= 0) return false;
+  return countLoggedDays(goal) >= effectiveTarget(goal);
+}
+
 export function todosProgress(goal) {
   const todos = goal.todos ?? [];
   return { done: todos.filter(t => t.done).length, total: todos.length };
